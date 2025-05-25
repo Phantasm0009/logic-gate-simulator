@@ -13,4 +13,5 @@ root.render(
 );
 
 console.log('Logic Gate Simulator initialized!');
-console.log('Tip: Click on switches to toggle them');
+console.log('Environment:', import.meta.env.MODE);
+console.log('Base URL:', import.meta.env.BASE_URL);

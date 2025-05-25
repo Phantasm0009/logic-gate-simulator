@@ -34,30 +34,36 @@ export function exportCircuitToFile(circuit, filename = 'circuit') {
 }
 
 /**
+ * Gets the base URL for the application
+ * @returns {string} The base URL
+ */
+function getBaseUrl() {
+  return import.meta.env.BASE_URL || '/';
+}
+
+/**
  * Creates a shareable URL for a circuit
  * @param {Object} circuit - Circuit data containing nodes and edges
  * @returns {Object} Object with success flag and generated URL or error message
  */
 export function createShareableUrl(circuit) {
   try {
-    // Convert circuit to compressed format to reduce URL length
-    const compressedCircuit = compressCircuit(circuit);
+    const compressed = compressCircuit(circuit);
+    const encodedData = btoa(JSON.stringify(compressed));
     
-    // Create base64 encoded string of the compressed circuit
-    const circuitData = btoa(JSON.stringify(compressedCircuit));
+    // Use the correct base URL for production
+    const baseUrl = window.location.origin + getBaseUrl();
+    const url = new URL(baseUrl);
+    url.searchParams.set('circuit', encodedData);
     
-    // Create URL with the circuit data as a parameter
-    const url = new URL(window.location.href);
-    url.searchParams.set('circuit', circuitData);
-    
-    return { 
-      success: true, 
+    return {
+      success: true,
       url: url.toString()
     };
   } catch (error) {
     console.error('Error creating shareable URL:', error);
-    return { 
-      success: false, 
+    return {
+      success: false,
       error: error.message
     };
   }

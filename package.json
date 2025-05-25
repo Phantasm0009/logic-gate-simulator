@@ -2,7 +2,9 @@
   "name": "logic-gate-simulator",
   "version": "1.0.0",
   "description": "Interactive logic gate simulator for learning digital logic",
-  "type": "module",  "scripts": {
+  "type": "module",
+  "homepage": "https://Phantasm0009.github.io/logic-gate-simulator/",
+  "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
