@@ -1,81 +1,199 @@
 import React from 'react';
 
-export const GateIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="4" y="4" width="16" height="16" rx="2" />
-    <path d="M12 4v16" />
-    <path d="M4 12h16" />
+// Basic Logic Gate Icons
+export const AndGateIcon = () => (
+  <svg viewBox="0 0 100 60" width="100%" height="100%">
+    <path d="M20 10 L50 10 Q70 10 70 30 Q70 50 50 50 L20 50 Z" 
+          fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+    <text x="45" y="35" fontSize="12" textAnchor="middle" fill="white">AND</text>
   </svg>
 );
 
-export const InfoIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
+export const OrGateIcon = () => (
+  <svg viewBox="0 0 100 60" width="100%" height="100%">
+    <path d="M20 10 Q40 10 50 30 Q40 50 20 50 Q35 30 20 10 Z" 
+          fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+    <text x="40" y="35" fontSize="12" textAnchor="middle" fill="white">OR</text>
+  </svg>
+);
+
+export const NotGateIcon = () => (
+  <svg viewBox="0 0 100 60" width="100%" height="100%">
+    <path d="M20 10 L60 30 L20 50 Z" 
+          fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+    <circle cx="65" cy="30" r="5" fill="currentColor" stroke="currentColor"/>
+    <text x="35" y="35" fontSize="10" textAnchor="middle" fill="white">NOT</text>
+  </svg>
+);
+
+export const XorGateIcon = () => (
+  <svg viewBox="0 0 100 60" width="100%" height="100%">
+    <path d="M20 10 Q40 10 50 30 Q40 50 20 50 Q35 30 20 10 Z" 
+          fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+    <path d="M15 10 Q30 30 15 50" fill="none" stroke="currentColor" strokeWidth="2"/>
+    <text x="40" y="35" fontSize="12" textAnchor="middle" fill="white">XOR</text>
+  </svg>
+);
+
+export const NandGateIcon = () => (
+  <svg viewBox="0 0 100 60" width="100%" height="100%">
+    <path d="M20 10 L50 10 Q70 10 70 30 Q70 50 50 50 L20 50 Z" 
+          fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+    <circle cx="75" cy="30" r="5" fill="currentColor" stroke="currentColor"/>
+    <text x="45" y="35" fontSize="10" textAnchor="middle" fill="white">NAND</text>
+  </svg>
+);
+
+export const NorGateIcon = () => (
+  <svg viewBox="0 0 100 60" width="100%" height="100%">
+    <path d="M20 10 Q40 10 50 30 Q40 50 20 50 Q35 30 20 10 Z" 
+          fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+    <circle cx="55" cy="30" r="5" fill="currentColor" stroke="currentColor"/>
+    <text x="40" y="35" fontSize="11" textAnchor="middle" fill="white">NOR</text>
+  </svg>
+);
+
+export const SwitchIcon = () => (
+  <svg viewBox="0 0 100 60" width="100%" height="100%">
+    <rect x="15" y="22" width="70" height="16" rx="8" ry="8" 
+          fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+    <circle cx="70" cy="30" r="10" fill="white" stroke="currentColor" strokeWidth="2"/>
+    <text x="35" y="34" fontSize="12" textAnchor="middle" fill="white">0/1</text>
+  </svg>
+);
+
+// Generic gate icon component that can render different gate types
+export const GateIcon = ({ type, className, ...props }) => {
+  const iconMap = {
+    andGate: AndGateIcon,
+    orGate: OrGateIcon,
+    notGate: NotGateIcon,
+    xorGate: XorGateIcon,
+    nandGate: NandGateIcon,
+    norGate: NorGateIcon,
+    switch: SwitchIcon
+  };
+
+  const IconComponent = iconMap[type];
+  
+  if (!IconComponent) {
+    return (
+      <svg viewBox="0 0 100 60" width="100%" height="100%" className={className} {...props}>
+        <rect x="10" y="10" width="80" height="40" fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+        <text x="50" y="35" fontSize="12" textAnchor="middle" fill="white">?</text>
+      </svg>
+    );
+  }
+
+  return (
+    <div className={className} {...props}>
+      <IconComponent />
+    </div>
+  );
+};
+
+// Info icon component
+export const InfoIcon = ({ className, ...props }) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    viewBox="0 0 24 24" 
+    width="18" 
+    height="18" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    className={className}
+    {...props}
+  >
     <circle cx="12" cy="12" r="10" />
-    <line x1="12" y1="16" x2="12" y2="12" />
-    <line x1="12" y1="8" x2="12.01" y2="8" />
+    <path d="M12 16v-4" />
+    <path d="M12 8h.01" />
   </svg>
 );
 
-export const TableIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="3" y="3" width="18" height="18" rx="2" />
-    <line x1="3" y1="9" x2="21" y2="9" />
-    <line x1="3" y1="15" x2="21" y2="15" />
-    <line x1="9" y1="3" x2="9" y2="21" />
-    <line x1="15" y1="3" x2="15" y2="21" />
+// Trash icon component
+export const TrashIcon = ({ className, ...props }) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    viewBox="0 0 24 24" 
+    width="18" 
+    height="18" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    className={className}
+    {...props}
+  >
+    <polyline points="3,6 5,6 21,6" />
+    <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6" />
+    <line x1="10" y1="11" x2="10" y2="17" />
+    <line x1="14" y1="11" x2="14" y2="17" />
   </svg>
 );
 
-export const TrashIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M3 6h18" />
-    <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-    <path d="M10 11v6" />
-    <path d="M14 11v6" />
+// Save icon component
+export const SaveIcon = ({ className, ...props }) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    viewBox="0 0 24 24" 
+    width="18" 
+    height="18" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    className={className}
+    {...props}
+  >
+    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+    <polyline points="17,21 17,13 7,13 7,21" />
+    <polyline points="7,3 7,8 15,8" />
   </svg>
 );
 
-export const PlusIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
-    <circle cx="12" cy="12" r="10" />
-    <line x1="12" y1="8" x2="12" y2="16" />
-    <line x1="8" y1="12" x2="16" y2="12" />
+// Load icon component
+export const LoadIcon = ({ className, ...props }) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    viewBox="0 0 24 24" 
+    width="18" 
+    height="18" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    className={className}
+    {...props}
+  >
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+    <polyline points="14,2 14,8 20,8" />
+    <line x1="16" y1="13" x2="8" y2="13" />
+    <line x1="16" y1="17" x2="8" y2="17" />
+    <polyline points="10,9 9,9 8,9" />
   </svg>
 );
 
-export const SaveIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
-    <polyline points="17 21 17 13 7 13 7 21" />
-    <polyline points="7 3 7 8 15 8" />
-  </svg>
-);
-
-export const LoadIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-    <polyline points="17 8 12 3 7 8" />
-    <line x1="12" y1="3" x2="12" y2="15" />
-  </svg>
-);
-
-export const ExpandIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
-    <polyline points="15 3 21 3 21 9" />
-    <polyline points="9 21 3 21 3 15" />
-    <line x1="21" y1="3" x2="14" y2="10" />
-    <line x1="3" y1="21" x2="10" y2="14" />
-  </svg>
-);
-
-export const FullscreenIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3" />
-  </svg>
-);
-
-export const ShareIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
+// Share icon component
+export const ShareIcon = ({ className, ...props }) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    viewBox="0 0 24 24" 
+    width="18" 
+    height="18" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    className={className}
+    {...props}
+  >
     <circle cx="18" cy="5" r="3" />
     <circle cx="6" cy="12" r="3" />
     <circle cx="18" cy="19" r="3" />

@@ -94,6 +94,106 @@ export function analyzeCircuitForRealWorldExamples(nodes, edges) {
 }
 
 /**
+ * Analyze a circuit and return relevant real-world examples
+ * @param {Array} nodes - Array of circuit nodes
+ * @param {Array} edges - Array of circuit edges
+ * @returns {Object|null} Real-world example object or null if none found
+ */
+export function analyzeCircuitForRealWorldExample(nodes, edges) {
+  if (!nodes || nodes.length === 0) {
+    return null;
+  }
+
+  // Count different types of components
+  const componentCounts = nodes.reduce((counts, node) => {
+    const type = node.type;
+    counts[type] = (counts[type] || 0) + 1;
+    return counts;
+  }, {});
+
+  // Analyze circuit patterns
+  
+  // Check for binary clock pattern
+  if (componentCounts.binaryClock >= 1) {
+    return realWorldExamples.binaryClock;
+  }
+
+  // Check for adder patterns
+  if (componentCounts.fullAdder >= 1) {
+    return realWorldExamples.fullAdder;
+  }
+  
+  if (componentCounts.halfAdder >= 1) {
+    return realWorldExamples.halfAdder;
+  }
+
+  // Check for complex components
+  if (componentCounts.multiplexer >= 1) {
+    return realWorldExamples.multiplexer;
+  }
+
+  if (componentCounts.binaryDisplay >= 1 || componentCounts.multiLED >= 1) {
+    return realWorldExamples.binaryDisplay;
+  }
+
+  if (componentCounts.binaryDecoder >= 1) {
+    return realWorldExamples.decoder;
+  }
+
+  if (componentCounts.binaryEncoder >= 1) {
+    return realWorldExamples.encoder;
+  }
+
+  // Check for basic gate patterns
+  const totalGates = (componentCounts.andGate || 0) + 
+                    (componentCounts.orGate || 0) + 
+                    (componentCounts.notGate || 0) + 
+                    (componentCounts.xorGate || 0) + 
+                    (componentCounts.nandGate || 0) + 
+                    (componentCounts.norGate || 0);
+
+  // Multi-gate circuits
+  if (totalGates >= 3) {
+    // Complex logic - look for dominant gate type
+    const dominantGate = Object.entries(componentCounts)
+      .filter(([type]) => type.includes('Gate'))
+      .sort(([,a], [,b]) => b - a)[0];
+    
+    if (dominantGate && realWorldExamples[dominantGate[0]]) {
+      return realWorldExamples[dominantGate[0]];
+    }
+  }
+
+  // Single gate circuits
+  if (componentCounts.andGate >= 1) {
+    return realWorldExamples.andGate;
+  }
+  
+  if (componentCounts.orGate >= 1) {
+    return realWorldExamples.orGate;
+  }
+  
+  if (componentCounts.notGate >= 1) {
+    return realWorldExamples.notGate;
+  }
+  
+  if (componentCounts.xorGate >= 1) {
+    return realWorldExamples.xorGate;
+  }
+  
+  if (componentCounts.nandGate >= 1) {
+    return realWorldExamples.nandGate;
+  }
+  
+  if (componentCounts.norGate >= 1) {
+    return realWorldExamples.norGate;
+  }
+
+  // Default fallback
+  return null;
+}
+
+/**
  * Gets a single random example from all applicable examples
  * @param {Array} nodes - Circuit nodes
  * @param {Array} edges - Circuit edges
@@ -110,3 +210,94 @@ export function getRandomRealWorldExample(nodes, edges) {
   const randomIndex = Math.floor(Math.random() * examples.length);
   return examples[randomIndex];
 }
+
+// Real-world examples database
+const realWorldExamples = {
+  // Basic logic gates
+  andGate: {
+    title: "Security Systems",
+    description: "AND gates are used in security systems where multiple conditions must be met (keycard AND PIN) to grant access.",
+    icon: "🔒"
+  },
+  orGate: {
+    title: "Emergency Systems", 
+    description: "OR gates activate emergency lighting when ANY smoke detector OR manual alarm is triggered.",
+    icon: "🚨"
+  },
+  notGate: {
+    title: "Automatic Lighting",
+    description: "NOT gates turn on street lights when it's NOT daytime (inverting daylight sensor input).",
+    icon: "💡"
+  },
+  xorGate: {
+    title: "Two-Way Switches",
+    description: "XOR gates control hallway lights that can be turned on/off from either end of the hallway.",
+    icon: "💡"
+  },
+  nandGate: {
+    title: "Computer Memory",
+    description: "NAND gates are the building blocks of computer memory and processors due to their universal logic properties.",
+    icon: "💾"
+  },
+  norGate: {
+    title: "Industrial Safety",
+    description: "NOR gates ensure machines stop when ANY safety condition fails (emergency stop OR door open OR guard removed).",
+    icon: "⚠️"
+  },
+
+  // Complex circuits
+  halfAdder: {
+    title: "Calculator Circuits",
+    description: "Half adders are fundamental building blocks in calculators and computers for binary arithmetic operations.",
+    icon: "🧮"
+  },
+  fullAdder: {
+    title: "CPU Arithmetic Unit",
+    description: "Full adders chain together to create the arithmetic logic unit (ALU) in computer processors.",
+    icon: "🖥️"
+  },
+  binaryClock: {
+    title: "Digital Clocks",
+    description: "Binary clocks demonstrate how time is stored and displayed in digital systems using binary representation.",
+    icon: "⏰"
+  },
+  multiplexer: {
+    title: "Data Routing",
+    description: "Multiplexers route data in computer networks and select which input signal gets transmitted.",
+    icon: "🌐"
+  },
+  binaryDisplay: {
+    title: "Digital Displays",
+    description: "Binary displays show how numbers are represented internally in computers and digital devices.",
+    icon: "📟"
+  },
+  decoder: {
+    title: "Address Decoding",
+    description: "Decoders select specific memory locations in computer RAM based on binary address inputs.",
+    icon: "🎯"
+  },
+  encoder: {
+    title: "Keyboard Input",
+    description: "Encoders convert keyboard presses into binary codes that computers can understand and process.",
+    icon: "⌨️"
+  }
+};
+
+/**
+ * Get all available real-world examples
+ * @returns {Object} All real-world examples
+ */
+export function getAllRealWorldExamples() {
+  return realWorldExamples;
+}
+
+/**
+ * Get a specific real-world example by key
+ * @param {string} key - The example key
+ * @returns {Object|null} The example object or null if not found
+ */
+export function getRealWorldExample(key) {
+  return realWorldExamples[key] || null;
+}
+
+export default realWorldExamples;

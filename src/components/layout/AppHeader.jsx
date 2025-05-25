@@ -6,7 +6,8 @@ const AppHeader = ({
   saveCircuit,
   loadCircuit,
   clearCircuit,
-  exportCircuit
+  exportCircuit,
+  openTeacherDashboard // Add this prop
 }) => {
   return (
     <header className="app-header">
@@ -25,14 +26,18 @@ const AppHeader = ({
         </svg>
         <span>Logic Gate Simulator</span>
       </div>
-      <div className="app-nav">        <button onClick={toggleSidebar} className="nav-button">
+      <div className="app-nav">
+        <button onClick={toggleSidebar} className="nav-button">
           {sidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
         </button>
         <button onClick={saveCircuit} className="nav-button">Save</button>
         <button onClick={loadCircuit} className="nav-button">Load</button>
         <button onClick={clearCircuit} className="nav-button">Clear</button>
         <button onClick={exportCircuit} className="nav-button share-button">Share</button>
-        <a href="https://github.com/yourusername/logic-gate-simulator" target="_blank" rel="noopener noreferrer" className="nav-button help-link">Help</a>
+        <button onClick={openTeacherDashboard} className="nav-button teacher-button">
+          🎓 Teacher
+        </button>
+        <a href="https://github.com/Phantasm0009/logic-gate-simulator" target="_blank" rel="noopener noreferrer" className="nav-button help-link">Help</a>
       </div>
     </header>
   );

@@ -1,22 +1,18 @@
-import React, { useCallback, useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import ReactFlow, { 
+  useNodesState, 
+  useEdgesState, 
+  addEdge, 
+  applyNodeChanges,
+  applyEdgeChanges,
   Background, 
   Controls, 
-  MiniMap, 
+  MiniMap,
   Panel,
-  applyNodeChanges,
-  applyEdgeChanges, 
-  useNodesState, 
-  useEdgesState
+  Position 
 } from 'reactflow';
-import { SaveIcon, LoadIcon, TrashIcon, GateIcon, InfoIcon, TableIcon, ShareIcon } from './components/icons/index.jsx';
-import GridSettings from './components/layout/GridSettings';
-import BooleanExpressionPanel from './components/BooleanExpressionPanel';
-import GateTooltip from './components/GateTooltip';
-import ExplanationPanel from './components/ExplanationPanel';
-import RealWorldPopup from './components/RealWorldPopup';
-import CircuitSharingPanel from './components/CircuitSharingPanel';
-import AppHeader from './components/layout/AppHeader';
+
+// Import all gate components
 import AndGate from './components/gates/AndGate';
 import OrGate from './components/gates/OrGate';
 import NotGate from './components/gates/NotGate';
@@ -34,19 +30,58 @@ import BinaryComparator from './components/gates/BinaryComparator';
 import BinaryEncoder from './components/gates/BinaryEncoder';
 import BinaryDecoder from './components/gates/BinaryDecoder';
 import Multiplexer from './components/gates/Multiplexer';
-import AnimatedEdge from './components/AnimatedEdge';
-import BinaryCalculatorPanel from './components/BinaryCalculatorPanel';
-import useBooleanExpression from './hooks/useBooleanExpression';
+
+// Import layout components
+import AppHeader from './components/layout/AppHeader';
+import GridSettings from './components/layout/GridSettings';
+
+// Import utilities
+import evaluateCircuit from './utils/circuitEvaluator';
+import { generateExpression } from './utils/expressionGenerator';
 import { snapToGrid } from './utils/gridHelpers';
-import TruthTableGenerator from './components/TruthTableGenerator';
+import { generateUniqueId, generateNodeId, generateEdgeId } from './utils/idGenerator';
+import { analyzeCircuitForRealWorldExamples, analyzeCircuitForRealWorldExample } from './utils/realWorldExamples';
 import signalAnimationManager from './utils/signalAnimationManager';
-import { generateUniqueId, generateEdgeId, generateNodeId } from './utils/idGenerator';
-import { getRandomRealWorldExample } from './utils/realWorldExamples';
-import { importCircuitFromUrl } from './utils/circuitSharingService';
+import { 
+  exportCircuitToFile, 
+  createShareableUrl, 
+  importCircuitFromFile, 
+  importCircuitFromUrl 
+} from './utils/circuitSharingService';
+
+// Import components
+import TruthTableGenerator from './components/TruthTableGenerator';
+import BooleanExpressionPanel from './components/BooleanExpressionPanel';
+import ExplanationPanel from './components/ExplanationPanel';
+import GateTooltip from './components/GateTooltip';
+import RealWorldPopup from './components/RealWorldPopup';
+import CircuitSharingPanel from './components/CircuitSharingPanel';
+import BinaryCalculatorPanel from './components/BinaryCalculatorPanel';
+import TeacherDashboard from './components/TeacherDashboard';
+
+// Import hooks
+import useBooleanExpression from './hooks/useBooleanExpression';
 
 // Import styles
 import 'reactflow/dist/style.css';
 import './styles.css';
+
+// Import icons
+import { 
+  AndGateIcon, 
+  OrGateIcon, 
+  NotGateIcon, 
+  XorGateIcon, 
+  NandGateIcon, 
+  NorGateIcon, 
+  SwitchIcon,
+  GateIcon,
+  InfoIcon,
+  TrashIcon,
+  SaveIcon,
+  LoadIcon,
+  ShareIcon
+} from './components/icons';
 
 // Define custom node types
 const nodeTypes = {
@@ -118,6 +153,7 @@ function App() {
   const [gridSize, setGridSize] = useState(20);
   const [selectedNode, setSelectedNode] = useState(null);
   const [sidebarWidth, setSidebarWidth] = useState(300);
+  const [teacherDashboardVisible, setTeacherDashboardVisible] = useState(false);
   const sidebarRef = useRef(null);
   const resizingRef = useRef(false);
   
@@ -137,8 +173,6 @@ function App() {
     type: 'info',
     show: false
   });
-  
-  // Show a real-world example popup
   const showRealWorldExample = useCallback((message) => {
     // Clear any existing timeout
     if (realWorldPopup.timeoutId) {
@@ -2162,6 +2196,15 @@ function App() {
     setSidebarVisible(prev => !prev);
   }, []);
 
+  // Add the missing functions
+  const openTeacherDashboard = useCallback(() => {
+    setTeacherDashboardVisible(true);
+  }, []);
+
+  const closeTeacherDashboard = useCallback(() => {
+    setTeacherDashboardVisible(false);
+  }, []);
+
   // Add this function to handle node hover
   const onNodeMouseEnter = useCallback((event, node) => {
     if (node.type.includes('Gate')) {
@@ -2225,44 +2268,23 @@ function App() {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };  }, []);
-
-  // Debug useEffect for circuit visualization
+  // Debug useEffect for circuit visualization (only in development)
   useEffect(() => {
-    // Debug circuit visualization
-    console.log("Current nodes:", nodes);
-    console.log("Current edges:", edges);
-    
-    // Check visibility of React Flow container
-    setTimeout(() => {
-      const reactFlowContainer = document.querySelector('.react-flow');
-      if (reactFlowContainer) {
-        console.log("ReactFlow container:", {
-          width: reactFlowContainer.offsetWidth,
-          height: reactFlowContainer.offsetHeight,
-          visible: reactFlowContainer.offsetWidth > 0 && reactFlowContainer.offsetHeight > 0
-        });
-        
-        // Check visibility of nodes
-        const nodeElements = document.querySelectorAll('.react-flow__node');
-        console.log(`Found ${nodeElements.length} node elements in DOM`);
-        
-        if (nodeElements.length > 0) {
-          const firstNode = nodeElements[0];
-          const styles = window.getComputedStyle(firstNode);
-          console.log("First node styles:", {
-            display: styles.display,
-            visibility: styles.visibility,
-            opacity: styles.opacity,
-            width: styles.width,
-            height: styles.height,
-            position: styles.position,
-            zIndex: styles.zIndex
-          });
+    if (process.env.NODE_ENV === 'development') {
+      console.log("Current nodes:", nodes.length);
+      console.log("Current edges:", edges.length);
+      
+      // Check visibility of React Flow container with error handling
+      const checkReactFlowContainer = () => {
+        const reactFlowContainer = document.querySelector('.react-flow');
+        if (reactFlowContainer) {
+          console.log("ReactFlow container found and visible");
         }
-      } else {
-        console.error("ReactFlow container not found in DOM");
-      }
-    }, 1000);
+      };
+      
+      // Only run after a delay to ensure DOM is ready
+      setTimeout(checkReactFlowContainer, 2000);
+    }
   }, [nodes, edges]);
   
   // Add this function inside your App component to handle edge styling with animation states
@@ -2352,7 +2374,7 @@ function App() {
     
     // Only show examples when we have enough nodes to form an interesting circuit
     if (nodes.length >= 3 && edges.length >= 2) {
-      const example = getRandomRealWorldExample(nodes, edges);
+      const example = analyzeCircuitForRealWorldExample(nodes, edges);
       
       if (example) {
         showRealWorldExample(example.message);
@@ -2371,14 +2393,16 @@ function App() {
 
   return (
     <div className="app-container">
-      <AppHeader 
+      <AppHeader
         toggleSidebar={toggleSidebar}
         sidebarVisible={sidebarVisible}
         saveCircuit={saveCircuit}
         loadCircuit={loadCircuit}
         clearCircuit={clearCircuit}
+        exportCircuit={exportCircuit}
+        openTeacherDashboard={openTeacherDashboard}
       />
-      
+
       <div className="main-content">
         {sidebarVisible && (
           <div className="sidebar" ref={sidebarRef} style={{ width: `${sidebarWidth}px` }}>
@@ -2761,6 +2785,14 @@ function App() {
           onClose={() => setSharingPanelVisible(false)}
         />
       )}
+
+      {/* Teacher Dashboard Panel */}
+      <TeacherDashboard
+        isOpen={teacherDashboardVisible}
+        onClose={closeTeacherDashboard}
+        currentCircuit={{ nodes, edges }}
+        onImportCircuit={importCircuit}
+      />
     </div>
   );
 }
